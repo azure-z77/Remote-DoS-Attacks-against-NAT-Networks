@@ -1,0 +1,27 @@
+FROM ubuntu:20.04
+# FROM unbuntu:18.04
+
+# 避免交互式配置
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    iptables \
+    iproute2 \
+    iputils-ping \
+    tcpdump \
+    python3 \
+    python3-pip \
+    net-tools \
+    isc-dhcp-server \
+    curl \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# 创建必要的目录
+RUN mkdir -p /var/run/dhcp-server
+
+# 设置IP转发
+RUN echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+
+EXPOSE 22 80
+CMD ["/bin/bash"]

@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # NAT Device (Router)
+  nat_device:
+    build:
+      context: ./nat_device
+      dockerfile: Dockerfile-lowVersion
+    container_name: nat_container
+    networks:
+      internal_net:
+        ipv4_address: 192.168.1.2
+      external_net:
+        ipv4_address: 10.0.0.2
+    privileged: true
+    volumes:
+      - ./configs:/configs
+      - ./logs:/logs
+      - ./scripts:/scripts
+    sysctls:
+      - net.ipv4.ip_forward=1
+    command: /scripts/nat_setup.sh
+
+  # Client
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client_container
+    networks:
+      internal_net:
+        ipv4_address: 192.168.1.100
+    depends_on:
+      - nat_device
+    volumes:
+      - ./scripts:/scripts
+      - ./logs:/logs
+    environment:
+      - NAT_GATEWAY=192.168.1.2
+    cap_add:
+      - NET_ADMIN 
+    command: /scripts/client_setup.sh
+
+  # External Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server_container
+    networks:
+      external_net:
+        ipv4_address: 10.0.0.10
+    ports:
+      - "127.0.0.1:8880:80"
+      - "127.0.0.1:2222:22"
+      - "127.0.0.1:2121:21"
+    volumes:
+      - ./configs:/configs
+      - ./logs:/logs
+      - ./scripts:/scripts
+    command: /scripts/server_setup.sh
+
+  # Attacker
+  attacker:
+    build:
+      context: ./attacker
+      dockerfile: Dockerfile
+    container_name: attacker_container
+    networks:
+      external_net:
+        ipv4_address: 10.0.0.100
+    depends_on:
+      - server
+    volumes:
+      - ./scripts:/scripts
+      - ./logs:/logs
+      - ./output:/output
+    command: ["sleep", "infinity"]
+
+networks:
+  internal_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  external_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
