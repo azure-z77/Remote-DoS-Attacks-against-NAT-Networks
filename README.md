@@ -66,3 +66,7 @@ dos_port = 5003
 ```
 python client.py
 ```
+
+## 目录介绍
+#### redan_experiment
+包含`start_experiment.sh`和`docker-compose.yml`用于快速构建一个NAT测试环境，免去自己调试的烦恼
