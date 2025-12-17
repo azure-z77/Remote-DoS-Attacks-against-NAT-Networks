@@ -1,4 +1,6 @@
 # Remote DoS Attacks against NAT Networks
+This repo is a fork of the official repository for ReDAN: An Empirical Study on Remote DoS Attacks against NAT Networks, adding code for paper reproduction
+
 This repo is used to detect whether the client is under NAT and determine whether it can be DoS attacked.
 
 If you use any derivative of the code or datasets from our work, please cite our publicaiton:
@@ -67,6 +69,6 @@ dos_port = 5003
 python client.py
 ```
 
-## 目录介绍
+## Directory Structure
 #### redan_experiment
-包含`start_experiment.sh`和`docker-compose.yml`用于快速构建一个NAT测试环境，免去自己调试的烦恼
+`start_experiment.sh` and `docker-compose.yml` are used to quickly set up a NAT testing environment, saving you the hassle of manual debugging.
